@@ -1,19 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const Sales = require("./../../models/Sales");
+const Counter = require("./../../models/Counter");
 const Order = require("./../../models/Order");
 const isEmpty = require("./../../validators/is-empty");
 const moment = require("moment-timezone");
 const numberFormat = require("./../../utils/numberFormat");
 
-/* const net = require("net");
-const HOST = "192.168.254.1";
-const PORT = 9100;
-const client = new net.Socket(); */
-
-/* client.on("error", err => {
-  console.log("Unable to Connect");
-}); */
+router.get("/:id", (req, res) => {
+  Sales.findById(req.params.id)
+    .then(record => res.json(record))
+    .catch(err => console.log(err));
+});
 
 router.get("/invoices", (req, res) => {
   console.log(req.query);
@@ -28,41 +26,45 @@ router.get("/invoices", (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  const form_data = isEmpty(req.query)
+  const form_data = isEmpty(req.query.s)
     ? {}
     : {
-        name: {
-          $regex: "^" + req.query.s
-        }
+        or_no: req.query.s
       };
 
-  Table.find(form_data)
-    .then(table => {
-      return res.json(table);
+  Sales.find(form_data)
+    .sort({ _id: -1 })
+    .then(sales => {
+      return res.json(sales);
     })
     .catch(err => console.log(err));
 });
 
 router.put("/", (req, res) => {
-  const newSale = new Sales({
-    datetime: moment.tz("Asia/Manila").valueOf(),
-    items: req.body.items,
-    uid: req.body.uid,
-    payment_amount: req.body.payment_amount,
-    change: req.body.change
-  });
+  Counter.increment("or_no").then(result => {
+    const or_no = result.next;
 
-  newSale
-    .save()
-    .then(Sale => {
-      Order.deleteMany({ uid: req.body.uid })
-        .then(() => {
-          console.log("deleted successfully");
-        })
-        .catch(err => console.log(err));
-      return res.json({ success: 1 });
-    })
-    .catch(err => console.log(err));
+    const newSale = new Sales({
+      or_no,
+      datetime: moment.tz("Asia/Manila").toDate(),
+      items: req.body.items,
+      uid: req.body.uid,
+      payment_amount: req.body.payment_amount,
+      change: req.body.change
+    });
+
+    newSale
+      .save()
+      .then(Sale => {
+        Order.deleteMany({ uid: req.body.uid })
+          .then(() => {
+            console.log("deleted successfully");
+          })
+          .catch(err => console.log(err));
+        return res.json({ success: 1 });
+      })
+      .catch(err => console.log(err));
+  });
 });
 
 module.exports = router;

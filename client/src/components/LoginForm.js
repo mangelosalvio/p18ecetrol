@@ -35,7 +35,7 @@ class LoginForm extends Component {
   componentDidMount() {
     console.log(this.props.auth);
     if (this.props.auth.isAuthenticated) {
-      this.props.history.push("/customers");
+      this.props.history.push("/products");
     }
   }
 

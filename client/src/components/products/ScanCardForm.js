@@ -8,13 +8,11 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import classnames from "classnames";
-import isEmpty from "../../validation/is-empty";
 import "../../styles/Autosuggest.css";
 import { sumBy } from "lodash";
-import { Layout, message, notification } from "antd";
+import { Layout, message } from "antd";
 import numberFormat from "../../utils/numberFormat";
 import scanCardAudio from "./../../assets/scan-card.mp3";
-import scanAudio from "./../../assets/scan.mp3";
 import axios from "axios";
 const { Content } = Layout;
 
@@ -50,7 +48,10 @@ class ScanCardForm extends Component {
         const loading = message.loading("Waiting...", 0);
         axios.get("/scan-trolley-card").then(response => {
           loading();
-          const uid = response.data.uid;
+          const uid = response.data.uid
+            .replace(/(\r\n\t|\n|\r\t)/gm, "")
+            .trim();
+          console.log(uid);
           this.props.setUID({
             history: this.props.history,
             uid

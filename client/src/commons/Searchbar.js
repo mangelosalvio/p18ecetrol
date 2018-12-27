@@ -7,7 +7,8 @@ export default ({
   onSearch,
   onChange,
   isSearching = false,
-  onNew
+  onNew,
+  newButtonVisibility = true
 }) => {
   return (
     <form onSubmit={onSearch} style={{ margin: "16px 0px" }}>
@@ -36,7 +37,11 @@ export default ({
                 Search
               </button>
             </div>
-            <div className="control">
+            <div
+              className={classnames("control", {
+                "display-none": !newButtonVisibility
+              })}
+            >
               <a onClick={onNew} className={classnames("button is-small", {})}>
                 New
               </a>

@@ -40,6 +40,12 @@ class Navbar extends Component {
             Cashier
           </Link>
         </Menu.Item>
+        <Menu.Item key="4">
+          <Link to="/sales">
+            <Icon type="shopping-cart" />
+            Sales
+          </Link>
+        </Menu.Item>
 
         <Menu.Item style={{ float: "right" }} onClick={this.onLogout}>
           Logout

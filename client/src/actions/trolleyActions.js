@@ -11,7 +11,6 @@ import {
   SAVE_SALE
 } from "./types";
 import axios from "axios";
-import numeral from "numeral";
 import round from "../utils/round";
 
 export const setChange = ({

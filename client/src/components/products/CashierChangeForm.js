@@ -9,14 +9,11 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import classnames from "classnames";
-import isEmpty from "../../validation/is-empty";
 import "../../styles/Autosuggest.css";
 import { sumBy } from "lodash";
-import { Layout, message, notification } from "antd";
+import { Layout } from "antd";
 import numberFormat from "../../utils/numberFormat";
-import round from "../../utils/round";
 
-import axios from "axios";
 const { Content } = Layout;
 
 const collection_name = "products";
@@ -121,7 +118,7 @@ class CashierChangeForm extends Component {
               className="notification is-info has-text-centered has-text-weight-bold"
               style={{ fontSize: "2rem", padding: "5rem" }}
             >
-              CHANGE: {this.props.trolley.change}
+              CHANGE: {numberFormat(this.props.trolley.change)}
             </div>
 
             <div>

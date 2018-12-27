@@ -71,8 +71,9 @@ server.on("connection", socket => {
         socket.remotePort
       }`
     );
-    const index = sockets.indexOf(socket);
-    sockets = sockets.splice(index, 1);
+    /* const index = sockets.indexOf(socket);
+    sockets = sockets.splice(index, 1); */
+    sockets = [];
   });
 
   socket.on("error", err => {
@@ -82,10 +83,10 @@ server.on("connection", socket => {
       }`
     );
 
-    console.log(err);
+    /* const index = sockets.indexOf(socket);
+    sockets = sockets.splice(index, 1); */
 
-    const index = sockets.indexOf(socket);
-    sockets = sockets.splice(index, 1);
+    sockets = [];
   });
 });
 

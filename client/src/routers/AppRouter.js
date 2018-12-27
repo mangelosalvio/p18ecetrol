@@ -22,6 +22,7 @@ import ScanCardForm from "../components/products/ScanCardForm";
 import CashierScanCardForm from "../components/products/CashierScanCardForm";
 import CashierPaymentForm from "../components/products/CashierPaymentForm";
 import CashierChangeForm from "../components/products/CashierChangeForm";
+import Sales from "../components/products/sales";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -31,6 +32,7 @@ const AppRouter = () => (
         <Route path="/login" component={LoginForm} exact={true} />
         <PrivateRoute path="/products" component={Products} exact={true} />
         <PrivateRoute path="/users" component={Users} exact={true} />
+        <PrivateRoute path="/sales" component={Sales} exact={true} />
         <PrivateRoute
           path="/cashier-scan"
           component={CashierScanCardForm}

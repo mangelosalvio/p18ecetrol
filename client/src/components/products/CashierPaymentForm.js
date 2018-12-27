@@ -13,11 +13,10 @@ import classnames from "classnames";
 import isEmpty from "../../validation/is-empty";
 import "../../styles/Autosuggest.css";
 import { sumBy } from "lodash";
-import { Layout, message, notification } from "antd";
+import { Layout, message } from "antd";
 import numberFormat from "../../utils/numberFormat";
 import round from "../../utils/round";
 
-import axios from "axios";
 const { Content } = Layout;
 
 const collection_name = "products";
@@ -59,8 +58,6 @@ class CashierScanCardForm extends Component {
             return item.amount;
           })
         );
-
-        const errors = {};
 
         if (isEmpty(this.state.payment_amount)) {
           message.error("Input is invalid");

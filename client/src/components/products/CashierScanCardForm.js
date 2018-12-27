@@ -9,13 +9,11 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import classnames from "classnames";
-import isEmpty from "../../validation/is-empty";
 import "../../styles/Autosuggest.css";
 import { sumBy } from "lodash";
-import { Layout, message, notification } from "antd";
+import { Layout, message } from "antd";
 import numberFormat from "../../utils/numberFormat";
 import scanCardAudio from "./../../assets/scan-card.mp3";
-import scanAudio from "./../../assets/scan.mp3";
 import axios from "axios";
 const { Content } = Layout;
 

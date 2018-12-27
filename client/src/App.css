@@ -217,3 +217,11 @@ div.flex-end-container {
   display: flex !important ;
   align-items: flex-end !important;
 }
+
+.display-none {
+  display: none !important;
+}
+
+.b-t-2 th {
+  border-top: 2px solid #000 !important;
+}
