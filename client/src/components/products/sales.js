@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 
-import TextFieldGroup from "../../commons/TextFieldGroup";
 import axios from "axios";
 import isEmpty from "../../validation/is-empty";
 import MessageBoxInfo from "../../commons/MessageBoxInfo";
@@ -123,8 +122,6 @@ class Sales extends Component {
   };
 
   render() {
-    const { errors } = this.state;
-
     return (
       <Content style={{ padding: "0 50px" }}>
         <div className="columns is-marginless">

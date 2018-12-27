@@ -61,6 +61,7 @@ class RemoveItemForm extends Component {
       const total_weight = sumBy(all_items, o =>
         round(o.product.weight * o.quantity)
       );
+
       const min_weight = total_weight * 0.9;
       const max_weight = total_weight * 1.1;
 
@@ -69,8 +70,18 @@ class RemoveItemForm extends Component {
         this.setState({ isLoading: false }, () => {
           loading();
           const actual_weight = response.data.weight;
-
-          if (min_weight <= actual_weight && actual_weight <= max_weight) {
+          console.log(all_items.length);
+          console.log(actual_weight);
+          if (all_items.length === 0 && actual_weight < 0.5) {
+            this.props.deleteItem({
+              items: this.props.trolley.items,
+              index: this.props.trolley.selected_index,
+              history: this.props.history
+            });
+          } else if (
+            min_weight <= actual_weight &&
+            actual_weight <= max_weight
+          ) {
             this.props.deleteItem({
               items: this.props.trolley.items,
               index: this.props.trolley.selected_index,
