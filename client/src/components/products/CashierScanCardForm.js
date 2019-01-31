@@ -47,7 +47,7 @@ class CashierScanCardForm extends Component {
       () => {
         new Audio(scanCardAudio).play();
         const loading = message.loading("Waiting...", 0);
-        axios.get("/scan-trolley-card").then(response => {
+        axios.get("/scan-cashier-trolley-card").then(response => {
           loading();
           const uid = response.data.uid;
 

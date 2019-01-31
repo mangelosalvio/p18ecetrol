@@ -43,7 +43,22 @@ if (process.env.NODE_ENV === "production") {
 
 const port = process.env.SERVER_PORT || 5000;
 const tcp_port = process.env.TCP_PORT || 1337;
+const cashier_tcp_port = process.env.CASHIER_TCP_PORT || 1338;
+
 const server = net.createServer(socket => {
+  console.log(
+    "Client connect. Client local address : " +
+      socket.localAddress +
+      ":" +
+      socket.localPort +
+      ". socket remote address : " +
+      socket.remoteAddress +
+      ":" +
+      socket.remotePort
+  );
+});
+
+const cashier_server = net.createServer(socket => {
   console.log(
     "Client connect. Client local address : " +
       socket.localAddress +
@@ -60,7 +75,12 @@ server.listen(process.env.TCP_PORT, () => {
   console.log(`TCP SERVER RUNNING ON PORT ${tcp_port}`);
 });
 
+cashier_server.listen(process.env.CASHIER_TCP_PORT, () => {
+  console.log(`CASHIER TCP SERVER RUNNING ON PORT ${cashier_tcp_port}`);
+});
+
 let sockets = [];
+let cashier_sockets = [];
 
 server.on("connection", socket => {
   sockets.push(socket);
@@ -90,12 +110,40 @@ server.on("connection", socket => {
   });
 });
 
+cashier_server.on("connection", socket => {
+  cashier_sockets.push(socket);
+
+  socket.on("close", data => {
+    console.log(
+      `Closing connection of ${socket.remoteAddress} of port ${
+        socket.remotePort
+      }`
+    );
+
+    cashier_sockets = [];
+  });
+
+  socket.on("error", err => {
+    console.log(
+      `Error on connection in ${socket.remoteAddress} of port ${
+        socket.remotePort
+      }`
+    );
+
+    cashier_sockets = [];
+  });
+});
+
 app.get("/weight", (req, res) => {
   getWeight().then(object => res.json(object));
 });
 
 app.get("/scan-trolley-card", (req, res) => {
   scanTrolleyCard().then(object => res.json(object));
+});
+
+app.get("/scan-cashier-trolley-card", (req, res) => {
+  scanCashierTrolleyCard().then(object => res.json(object));
 });
 
 const getWeight = () => {
@@ -114,6 +162,19 @@ const getWeight = () => {
 const scanTrolleyCard = () => {
   return new Promise((resolve, reject) => {
     sockets.forEach(socket => {
+      socket.write("tc");
+      socket.on("data", data => {
+        strData = data.toString().replace(/\'/g, '"');
+        object = JSON.parse(strData);
+        resolve(object);
+      });
+    });
+  });
+};
+
+const scanCashierTrolleyCard = () => {
+  return new Promise((resolve, reject) => {
+    cashier_sockets.forEach(socket => {
       socket.write("tc");
       socket.on("data", data => {
         strData = data.toString().replace(/\'/g, '"');
