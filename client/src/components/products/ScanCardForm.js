@@ -49,6 +49,7 @@ class ScanCardForm extends Component {
         axios.get("/scan-trolley-card").then(response => {
           loading();
           const uid = response.data.uid
+            .toString()
             .replace(/(\r\n\t|\n|\r\t)/gm, "")
             .trim();
           console.log(uid);

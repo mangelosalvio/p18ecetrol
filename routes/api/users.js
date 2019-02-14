@@ -46,6 +46,8 @@ router.post("/login", (req, res) => {
     return res.status(401).json(errors);
   }
 
+  console.log(req.body.username);
+
   User.findOne({
     username: req.body.username
   }).then(user => {

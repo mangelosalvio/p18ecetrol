@@ -5,7 +5,13 @@ import {
   cancel,
   setUID,
   setOrder,
-  setChange
+  setChange,
+  selectCashierItem,
+  incrementQuantity,
+  decrementQuantity,
+  updateCashierItem,
+  deleteCashierItem,
+  clearCashierCart
 } from "./../../actions/trolleyActions";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
@@ -13,7 +19,7 @@ import classnames from "classnames";
 import isEmpty from "../../validation/is-empty";
 import "../../styles/Autosuggest.css";
 import { sumBy } from "lodash";
-import { Layout, message } from "antd";
+import { Layout, message, Modal, Button } from "antd";
 import numberFormat from "../../utils/numberFormat";
 import round from "../../utils/round";
 
@@ -30,6 +36,9 @@ const form_data = {
   [collection_name]: [],
   isLoading: false,
   payment_amount: "",
+
+  update_modal_visible: false,
+
   errors: {}
 };
 
@@ -46,6 +55,10 @@ class CashierScanCardForm extends Component {
       this.props.history.push("/cashier-scan");
     }
   }
+  onBack = () => {
+    this.props.clearCashierCart();
+    this.props.history.push("/cashier-scan");
+  };
 
   onProcess = () => {
     this.setState(
@@ -90,6 +103,47 @@ class CashierScanCardForm extends Component {
     this.setState({ [e.target.name]: e.target.value });
   };
 
+  handleUpdate = () => {
+    console.log("update");
+  };
+  handleDelete = () => {
+    console.log("delete");
+  };
+  handleCancel = () => {
+    this.setState({ update_modal_visible: false });
+  };
+
+  openUpdateItemForm = (item, index) => {
+    console.log(item, index);
+    this.props.selectCashierItem({ item, index });
+    this.setState({ update_modal_visible: true });
+  };
+
+  onIncrementQuantity = () => {
+    this.props.incrementQuantity(this.props.trolley.selected_product);
+  };
+
+  onDecrementQuantity = () => {
+    this.props.decrementQuantity(this.props.trolley.selected_product);
+  };
+
+  onUpdate = () => {
+    this.props.updateCashierItem({
+      items: this.props.trolley.items,
+      selected_product: this.props.trolley.selected_product,
+      index: this.props.trolley.selected_index
+    });
+    this.setState({ update_modal_visible: false });
+  };
+
+  onDelete = () => {
+    this.props.deleteCashierItem({
+      items: this.props.trolley.items,
+      index: this.props.trolley.selected_index
+    });
+    this.setState({ update_modal_visible: false });
+  };
+
   render() {
     const items = this.props.trolley.items;
 
@@ -130,6 +184,7 @@ class CashierScanCardForm extends Component {
                         "is-selected":
                           this.props.trolley.selected_index === index
                       })}
+                      onClick={() => this.openUpdateItemForm(item, index)}
                     >
                       <td>
                         <span className="has-text-weight-bold">
@@ -177,8 +232,60 @@ class CashierScanCardForm extends Component {
               >
                 Process
               </a>
+
+              <a
+                className="button is-info"
+                style={{ width: "100%", marginTop: "0.5rem", padding: "2rem" }}
+                onClick={this.onBack}
+              >
+                Back
+              </a>
             </div>
           </div>
+          <Modal
+            title={
+              this.props.trolley.selected_product &&
+              this.props.trolley.selected_product.product &&
+              this.props.trolley.selected_product.product.name
+            }
+            visible={this.state.update_modal_visible}
+            onCancel={this.handleCancel}
+            footer={[
+              <Button key="back" onClick={this.onDelete}>
+                Delete
+              </Button>,
+              <Button key="submit" type="primary" onClick={this.onUpdate}>
+                Update
+              </Button>
+            ]}
+          >
+            <div className="" style={{ marginTop: "1rem" }}>
+              <div className="field has-addons">
+                <p className="control">
+                  <a className="button" onClick={this.onDecrementQuantity}>
+                    <span className="icon is-small">
+                      <i className="fas fa-minus" />
+                    </span>
+                  </a>
+                </p>
+                <p className="control" style={{ width: "60px" }}>
+                  <input
+                    type="text"
+                    className="input"
+                    readOnly={true}
+                    value={this.props.trolley.selected_product.quantity}
+                  />
+                </p>
+                <p className="control">
+                  <a className="button" onClick={this.onIncrementQuantity}>
+                    <span className="icon is-small">
+                      <i className="fas fa-plus" />
+                    </span>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </Modal>
         </div>
       </Content>
     );
@@ -198,6 +305,12 @@ export default connect(
     cancel,
     setUID,
     setOrder,
-    setChange
+    setChange,
+    selectCashierItem,
+    incrementQuantity,
+    decrementQuantity,
+    updateCashierItem,
+    deleteCashierItem,
+    clearCashierCart
   }
 )(withRouter(CashierScanCardForm));

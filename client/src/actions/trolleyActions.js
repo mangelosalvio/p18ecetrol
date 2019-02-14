@@ -60,6 +60,13 @@ export const clearCart = history => dispatch => {
   });
   history.push("/scan-card");
 };
+
+export const clearCashierCart = () => {
+  return {
+    type: CLEAR_CART
+  };
+};
+
 export const setUID = ({ history, uid }) => dispatch => {
   dispatch({
     type: SET_UID,
@@ -92,6 +99,18 @@ export const deleteItem = ({ items, index, history }) => dispatch => {
   history.push("/scan");
 };
 
+export const deleteCashierItem = ({ items, index }) => dispatch => {
+  const new_items = [...items];
+  new_items.splice(index, 1);
+
+  dispatch({
+    type: UPDATE_ITEMS,
+    payload: {
+      items: new_items
+    }
+  });
+};
+
 export const updateItem = ({
   items,
   selected_product,
@@ -100,6 +119,9 @@ export const updateItem = ({
 }) => dispatch => {
   const new_items = [...items];
   new_items[index] = selected_product;
+  new_items[index].amount = round(
+    selected_product.product.price * selected_product.quantity
+  );
 
   dispatch({
     type: UPDATE_ITEMS,
@@ -111,6 +133,25 @@ export const updateItem = ({
   history.push("/scan");
 };
 
+export const updateCashierItem = ({
+  items,
+  selected_product,
+  index
+}) => dispatch => {
+  const new_items = [...items];
+  new_items[index] = selected_product;
+  new_items[index].amount = round(
+    selected_product.product.price * selected_product.quantity
+  );
+
+  dispatch({
+    type: UPDATE_ITEMS,
+    payload: {
+      items: new_items
+    }
+  });
+};
+
 export const selectItem = ({ item, index, history }) => dispatch => {
   dispatch({
     type: SELECT_ITEM,
@@ -120,6 +161,16 @@ export const selectItem = ({ item, index, history }) => dispatch => {
     }
   });
   history.push("/update-item");
+};
+
+export const selectCashierItem = ({ item, index }) => dispatch => {
+  dispatch({
+    type: SELECT_ITEM,
+    payload: {
+      item,
+      index
+    }
+  });
 };
 
 export const scanItem = (barcode, history) => dispatch => {

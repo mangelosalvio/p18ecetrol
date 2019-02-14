@@ -8,14 +8,14 @@ const moment = require("moment-timezone");
 const numberFormat = require("./../../utils/numberFormat");
 const sumBy = require("lodash/sumBy");
 
-/* const net = require("net");
+const net = require("net");
 const HOST = process.env.PRINTER_HOST;
 const PORT = process.env.PRINTER_PORT;
 const client = new net.Socket();
 
 client.on("error", err => {
   console.log("Unable to Connect");
-}); */
+});
 
 router.get("/:id", (req, res) => {
   Sales.findById(req.params.id)
@@ -71,6 +71,7 @@ router.put("/", (req, res) => {
             console.log("deleted successfully");
           })
           .catch(err => console.log(err));
+        printSale(Sale);
         return res.json({ success: 1 });
       })
       .catch(err => console.log(err));
@@ -78,43 +79,73 @@ router.put("/", (req, res) => {
 });
 
 const printSale = sale => {
-  client.connect(
-    PORT,
-    HOST,
-    () => {
-      client.write(`Time : ${moment(sale.datetime).format("LLLL")}\n`);
-      client.write(`SI# : ${sale.or_no}\n`);
-      client.write(`${"-".repeat(37)}\n`);
-      sale.items.forEach(item => {
+  client.connect(PORT, HOST, () => {
+    client.write("\x1b\x40");
+    client.write("\x1b\x61\x01");
+    client.write("WALAWAD'S HYPERMART\n");
+    client.write("Owned & Operated By: WALAWAD CORP\n");
+    client.write("BRGY.17, BACOLOD CITY\n");
+    client.write("VAT REG TIN: 4444-444-444-444\n");
+    client.write("MIN: 123456789012345\n");
+    client.write("PTU: FP123455-1234-123456-000000\n");
+    client.write("SN: LGZ123455\n");
+    client.write("MACHINE: 001\n\n");
+
+    client.write("\x1b\x61\x00");
+    client.write(`Time : ${moment(sale.datetime).format("LLLL")}\n`);
+    client.write(`SI# : ${sale.or_no.toString().padStart(8, "0")}\n`);
+    client.write("-".repeat(40));
+
+    client.write("\x1b\x61\x00");
+
+    sale.items.forEach(item => {
+      client.write(
+        `${item.product.name}\x0d\x1b\x61\x02${numberFormat(
+          item.amount
+        )}\n\x1b\x61\x00`
+      );
+      if (item.quantity > 1) {
         client.write(
-          `${item.product.name.padEnd(27)}${numberFormat(item.amount).padStart(
-            10
-          )}\n`
+          `${item.quantity} @ ${numberFormat(item.product.price)}\n`
         );
-        if (item.quantity > 1) {
-          client.write(
-            `${item.quantity} @ ${numberFormat(item.product.price)}\n`
-          );
-        }
-      });
+      }
+    });
 
-      client.write(`${"-".repeat(37)}\n`);
+    client.write("-".repeat(40));
 
-      client.write(
-        `${"AMOUNT DUE".padStart(27)}${numberFormat(
-          sumBy(sales.items, o => o.amount)
-        ).padStart(10)}\n\n`
-      );
+    client.write(
+      `AMOUNT DUE\x0d\x1b\x61\x02${numberFormat(
+        sumBy(sale.items, o => o.amount)
+      )}\n\x1b\x61\x00`
+    );
+    client.write(
+      `CASH TENDERED\x0d\x1b\x61\x02${numberFormat(
+        sale.payment_amount
+      )}\n\x1b\x61\x00`
+    );
 
-      client.write(
-        `${"CASH TENDERED".padStart(27)}${sale.payment_amount.padStart(10)}\n`
-      );
-      client.write(`${"CHANGE".padStart(27)}${sale.change.padStart(10)}\n`);
-      client.write("\n\n\n\n\n\n");
+    client.write(
+      `CHANGE \x0d\x1b\x61\x02\x1b\x21\x1c${numberFormat(
+        sale.change
+      )}\n\n\x1b\x61\x00`
+    );
 
-      client.destroy();
-    }
-  );
+    client.write("\x1b\x40");
+    client.write("\x1b\x61\x01");
+    client.write("OFFICIAL RECEIPT\n");
+    client.write("THANK YOU COME AGAIN\n");
+    client.write("MSALVIO TECHNOLOGIES\n");
+    client.write("Brgy. Taculing, Bacolod City\n");
+    client.write("ACC# 123-123451234123-123412 2/14/2019\n");
+    client.write(
+      "This receipt shall be valid for five\nyears from the date of the permit\n"
+    );
+
+    client.write("\x1b\x40");
+    client.write("\x1b\x61\x00");
+
+    client.write("\n\n\n\n\n\n");
+    client.destroy();
+  });
 };
-
 module.exports = router;
